@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'recoMailerSystem',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -84,7 +85,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
