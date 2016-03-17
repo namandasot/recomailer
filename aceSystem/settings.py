@@ -99,6 +99,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+RECO_IP = 'http://52.35.25.23:8000'
+RECO_MAILER_API = RECO_IP+'/recoengine/?user='
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
