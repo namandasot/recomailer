@@ -1,0 +1,22 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Thank you for showing you interest on {{}}.{% endblocktrans %}
+
+{% trans "Below are some of the Recommended Properties for you based on your past search" %}
+
+<table>
+	<tr>
+		{% for recoProperty in recoProperties %}
+		    <td>
+		        <a href="{{recoProperty.url}}"><img src="{{recoProperty.imageUrl}}"></a>
+		        <br>
+		        <a href="google.com"><button>Enquire Now</button></a>
+		    </td>
+		{% endfor %}
+	</tr>
+</table>
+
+{% trans "Thanks for choosing HDFCRED!!" %}
+
+{% blocktrans %}The HDFCRED team{% endblocktrans %}
+
+{% endautoescape %}

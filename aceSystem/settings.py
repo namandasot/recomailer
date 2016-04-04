@@ -99,8 +99,13 @@ USE_L10N = True
 
 USE_TZ = True
 
-RECO_IP = 'http://52.35.25.23:8000'
-RECO_MAILER_API = RECO_IP+'/recoengine/?user='
+RECO_IP = 'http://127.0.0.1:8000'
+RECO_MAILER_API = RECO_IP+'/recoengine/mailer/?user='
+
+
+EMAIL_BACKEND = "sgbackend.SendGridBackend"
+SENDGRID_USER = "srmgupta"
+SENDGRID_PASSWORD = "SRM@75000"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
