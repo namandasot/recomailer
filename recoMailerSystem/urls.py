@@ -16,5 +16,6 @@ Including another URLconf
 from django.conf.urls import include, url
 
 urlpatterns = [
-               url(r'^$', 'recoMailerSystem.views.sendMail'),
+               url(r'^$', 'recoMailerSystem.views.cronJob'),
+               url(r'^enquireNow/$', 'recoMailerSystem.views.enquire'),
 ]

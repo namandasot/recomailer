@@ -4,44 +4,142 @@ import requests
 import ast
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
-
-
+from models import *
+import MySQLdb
 from recoMailerSystem.utilities.getUrls import getImageUrl, getProjUrl
+from datetime import date
 
 # Create your views here.
 
-def sendMail(request):
-    userId = request.GET.get('user',None)
+def sendMail(user, projectNo):
+    # userId = request.GET.get('user',None)
+    userId = user.unique_cookie_id
     print userId
 
-    req = requests.get(RECO_MAILER_API+userId)    
+    req = requests.get(RECO_MAILER_API + userId)    
     print req.status_code
     if req.status_code == 200:
         recoProperties = ast.literal_eval(req.content)
         for recoProperty in recoProperties:
-            recoProperty['imageUrl'] = getImageUrl(recoProperty['project_no'],recoProperty['project_name']).replace('https://www.','')
-            recoProperty['url'] = getProjUrl(recoProperty['project_no']).replace('https://www.','')
-        
-        #print recoProperties
-        
+            recoProperty['imageUrl'] = getImageUrl(recoProperty['project_no'], recoProperty['project_name']).replace('https://www.', '')
+            recoProperty['url'] = getProjUrl(recoProperty['project_no']).replace('https://www.', '')
 
-#         mail = SendMail('srmgupta', 'SRM@75000')
-#         msg_from       =  'HDFC RED <recommendation@hdfcred.com>'
-#         msg_subject   = 'HDFC RED: Recommended Properties For You'
-#         msg_text      = '<html><body><p>Hi %s, </p><p>Hope you are doing well.</p><p><b>Recommended Projects</b></p><p>Take a look at our exclusive recommendation for you.</p><br><table><tbody><tr><td><div style="float:left;width:125px;padding-right:5px;padding-bottom:35px"><a href="http://mandrillapp.com/track/click/30604381/www.hdfcred.com?p=eyJzIjoid096Mktxck1Ea1pMNFRDeTlldkRZXzdnSWgwIiwidiI6MSwicCI6IntcInVcIjozMDYwNDM4MSxcInZcIjoxLFwidXJsXCI6XCJodHRwOlxcXC9cXFwvd3d3LmhkZmNyZWQuY29tXFxcL3BpZC0xMjkxXCIsXCJpZFwiOlwiNTUyNGU3NjYzODQyNGQwMGE1M2U5ODU5MDYyYjg4Y2VcIixcInVybF9pZHNcIjpbXCI0MDRmNzUxZjFmNjgwZjQyOTFlZDI4NzA0NWY1OTA1ZGJiYzcxYzcxXCJdfSJ9" style="display:block" target="_blank"><div><div><img class="CToWUd" src="https://www.hdfcred.com/project-images1/728/728_Lifestyle_City_HD.jpg" height="100" width="100"><small>Vinay Unique Developers <br> <span>32 L+  </span></small></div></div></a></div></td><td><div style="float:left;width:125px;padding-right:5px;padding-bottom:35px"><a href="http://mandrillapp.com/track/click/30604381/www.hdfcred.com?p=eyJzIjoiaWJIdXVqajYxRkNwREpsS3QzZ2VmUVFjWjlrIiwidiI6MSwicCI6IntcInVcIjozMDYwNDM4MSxcInZcIjoxLFwidXJsXCI6XCJodHRwOlxcXC9cXFwvd3d3LmhkZmNyZWQuY29tXFxcL3BpZC0xNDMwXCIsXCJpZFwiOlwiNTUyNGU3NjYzODQyNGQwMGE1M2U5ODU5MDYyYjg4Y2VcIixcInVybF9pZHNcIjpbXCI0MDRmNzUxZjFmNjgwZjQyOTFlZDI4NzA0NWY1OTA1ZGJiYzcxYzcxXCJdfSJ9" style="display:block" target="_blank"><div><div><img class="CToWUd" src="https://ci5.googleusercontent.com/proxy/XGEjoax_09OerduoAMdIX7KookLjMucm16ok6FwZV7cx40R89b-3StUlOjB-M9mTyQ-ARv3M-TR3_a5NYuCcGUq6zkwfA2ySUQ6T-ceoG8rWM2uDOwZh9Q=s0-d-e1-ft#https://www.hdfcred.com/project-images1/1430/1430_Chhaya_Niwas.jpg" height="100" width="100"><small>Usha Breco Realty Limited<br> <span>25 L+  </span></small></div></div></a></div></td><td><div style="float:left;width:125px;padding-right:5px;padding-bottom:35px"><a href="http://mandrillapp.com/track/click/30604381/www.hdfcred.com?p=eyJzIjoiTWp0MlUwZVZaSUkydGUxQWlGQXl6TEdGZUkwIiwidiI6MSwicCI6IntcInVcIjozMDYwNDM4MSxcInZcIjoxLFwidXJsXCI6XCJodHRwOlxcXC9cXFwvd3d3LmhkZmNyZWQuY29tXFxcL3BpZC0xNTY4XCIsXCJpZFwiOlwiNTUyNGU3NjYzODQyNGQwMGE1M2U5ODU5MDYyYjg4Y2VcIixcInVybF9pZHNcIjpbXCI0MDRmNzUxZjFmNjgwZjQyOTFlZDI4NzA0NWY1OTA1ZGJiYzcxYzcxXCJdfSJ9" style="display:block" target="_blank"><div><div><img class="CToWUd" src="https://ci4.googleusercontent.com/proxy/6vLYuconv2DMb_gnwdiB2wtJsiioU2YdlupJEHDc2Pp0-a3Y83t-Mrah9svzYh1DFpqeGDNPPbIiexqaoKEvIoYhRKly4ReLx0n3O0Qx8r3ALmFuKM34LZQ=s0-d-e1-ft#https://www.hdfcred.com/project-images1/1568/1568_Eco_Eden_City.jpg" height="100" width="100"><small>Mayuresh Group<br> <span>31 L+  </span></small></div></div></a></div></td></tr></tbody></table></body></html>' % (recipient_name)
-#         mail.send_mail(msg_recipient, msg_from, msg_subject, msg_text)
-        
         mail = EmailMultiAlternatives(
-          subject="Your Subject",
+          subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
           from_email="HDFC RED <recommendation@hdfcred.com>",
-          to=["prateek.kumar@hdfcred.com"],
-          headers={"Reply-To": "hr@hdfcred.com"}
+          # change it to actual Email Ids
+          to=['prateek.kumar@hdfcred.com'],
+          headers={"Reply-To": "support@hdfcred.com"}
         )
         
-        content = {'recoProperties':recoProperties}
+        content = {'recoProperties':recoProperties, 'userId':userId}
         email = loader.render_to_string('email.html', content)
         mail.attach_alternative(email, "text/html")
         
         mail.send()
+
+from pymongo import MongoClient
+import datetime
+
+class MongoConnectionForWebsite:
+
+    def __init__(self):
+        url = 'mongodb://MLadmin:hdfcREDML@52.35.25.23:27017/websiteDataCapture'
+        connection = MongoClient(url)
+        db = connection.websiteDataCapture
+        self.collection = db.redData
+
+    def getLeads(self, timeDiff):
+        # TODO query for getting all the filled leads in the past 
+        
+        UTCdiff = 0
+
+        currentTime = datetime.datetime.now() - datetime.timedelta(minutes=UTCdiff)
+        splitted = str(currentTime).split(':')
+        currentTime = splitted[0] + ":" + splitted[1]
+        lastTime = datetime.datetime.now() - datetime.timedelta(minutes=UTCdiff + timeDiff)
+        splitted = str(lastTime).split(':')
+        lastTime = splitted[0] + ":" + splitted[1]
+
+        leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" , "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
+        
+        # lead2 = self.collection.find({ "data_storage_element" : "lead_popup" , "tsDate" :{"$gte": lastTime ,"$lt" : currentTime}})
+        
+        # print lead1
+        leads = []
+
+        for lead in leadFooterForm:
+            lead['phone'] = lead.pop('mobilenumber')
+            print lead
+            leads.append(lead)
+        
+        return leads
+
+mongo = MongoConnectionForWebsite()
+
+def cronJob(request):
+    leads = mongo.getLeads(20)
+    for lead in leads:
+        if User.objects.filter(unique_cookie_id=lead['unique_cookie_id']).exists():
+            user = User.objects.get(unique_cookie_id=lead['unique_cookie_id'])
+            
+            if len(lead['name'])!=0:
+                user.name = lead['name']
+            if len(lead['phone'])!=0:
+                user.phone=lead['phone']
+            if len(lead['email'])!=0:
+                user.email=lead['email']
+            user.save()
+        else:
+            user = User(unique_cookie_id=lead['unique_cookie_id'], name=lead['name'], phone=lead['phone'], email=lead['email'])
+            user.save()
+        if FilledLeads.objects.filter(user=user, project_no=lead['project_no']).exists():
+            #sendMail(user=user, projectNo=lead['project_no'])
+            pass
+        else:
+            filledLead = FilledLeads(user=user, project_no=lead['project_no'])
+            filledLead.save()
+            sendMail(user=user, projectNo=lead['project_no'])
+        
+def getProjectInfo(projectConfigNo):
+
+    db = MySQLdb.connect(host="127.0.0.1", port=3306, user="root", db="REDADMIN2", cursorclass=MySQLdb.cursors.DictCursor)
+    cur = db.cursor()
+    cur.execute("select * from REDADMIN2.all_project_info where Project_config_No="+str(projectConfigNo))
+    for row in cur.fetchall():
+        pass
     
+    #ToDo get data directly from 'cur' variable 
+    return row
+
+
+def enquire(request):
+    userId = request.GET.get('user', None)
+    projectId = request.GET.get('project', None)
+    projectConfigNo = request.GET.get('projectConfig', None)
+    project = getProjectInfo(projectConfigNo)
+    priceLen = len(str(project['Minimum_Price']))
+    
+    amenities = project['amenities'].split(',')
+    print amenities
+    project['amenitiesList']=[x for x in amenities if x]
+    if len(project['amenitiesList'])>12:
+        project['amenitiesList'] = project['amenitiesList'][:12]
+        
+    #ToDo
+    if priceLen<8 and priceLen>5:
+        project['price_string'] = str(project['Minimum_Price']/100000)+" L+"
+    elif priceLen>7:
+        project['price_string'] = str(project['Minimum_Price']/10000000.0)+" Cr+"
+    else:
+        project['price_string'] = project['Minimum_Price']
+    
+    project['imageUrl'] = getImageUrl(projectId, project['Project_Name'])
+    project['url'] = getProjUrl(projectId)
+
+    user = User.objects.get(unique_cookie_id=userId)
+    newLead = Lead(project_no=projectId, user=user)
+    newLead.save()
+    context = {'project':project}
+    return render(request, 'thankYou.html', context)
