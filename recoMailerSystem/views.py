@@ -44,7 +44,8 @@ def sendMail(user):
           subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
           from_email="HDFC RED <recommendation@hdfcred.com>",
-          to=[user.email],
+          #to=[user.email],
+          to=['prateek.kumar@hdfcred.com'],
           headers={"Reply-To": "support@hdfcred.com"}
         )
         
@@ -165,3 +166,4 @@ def enquire(request):
     newLead.save()
     context = {'project':project}
     return render(request, 'thankYou.html', context)
+
