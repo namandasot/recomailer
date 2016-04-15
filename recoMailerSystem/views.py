@@ -39,13 +39,12 @@ def sendMail(user):
             else:
                 recoProperty['price_string'] = recoProperty['minimum_price']
             
-            
+        print user.email    
         mail = EmailMultiAlternatives(
           subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
           from_email="HDFC RED <recommendation@hdfcred.com>",
-          # change it to actual Email Ids
-          to=['prateek.kumar@hdfcred.com','siyaram.gupta@hdfcred.com'],
+          to=[user.email],
           headers={"Reply-To": "support@hdfcred.com"}
         )
         
@@ -110,13 +109,14 @@ def cronJob(request):
         else:
             user = User(unique_cookie_id=lead['unique_cookie_id'], name=lead['name'], phone=lead['phone'], email=lead['email'])
             user.save()
+            
+            
         if FilledLeads.objects.filter(user=user, project_no=lead['project_no']).exists():
-            #sendMail(user=user, projectNo=lead['project_no'])
             pass
         else:
             filledLead = FilledLeads(user=user, project_no=lead['project_no'])
             filledLead.save()
-            sendMail(user=user) #, projectNo=lead['project_no']
+            sendMail(user=user)
 
 
 def sendMailTestApi(request):
