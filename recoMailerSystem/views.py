@@ -11,7 +11,7 @@ from datetime import date
 
 # Create your views here.
 
-def sendMail(user, projectNo):
+def sendMail(user):
     # userId = request.GET.get('user',None)
     userId = user.unique_cookie_id
     print userId
@@ -23,13 +23,29 @@ def sendMail(user, projectNo):
         for recoProperty in recoProperties:
             recoProperty['imageUrl'] = getImageUrl(recoProperty['project_no'], recoProperty['project_name']).replace('https://www.', '')
             recoProperty['url'] = getProjUrl(recoProperty['project_no']).replace('https://www.', '')
-
+            
+            amenities = recoProperty['amenities'].split(',')
+            print amenities
+            recoProperty['amenitiesList']=[x for x in amenities if x]
+            if len(recoProperty['amenitiesList'])>12:
+                recoProperty['amenitiesList'] = recoProperty['amenitiesList'][:12]
+                
+            #ToDo
+            priceLen = len(str(recoProperty['minimum_price']))
+            if priceLen<8 and priceLen>5:
+                recoProperty['price_string'] = str(recoProperty['minimum_price']/100000)+" L+"
+            elif priceLen>7:
+                recoProperty['price_string'] = str(recoProperty['minimum_price']/10000000.0)+" Cr+"
+            else:
+                recoProperty['price_string'] = recoProperty['minimum_price']
+            
+            
         mail = EmailMultiAlternatives(
           subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
           from_email="HDFC RED <recommendation@hdfcred.com>",
           # change it to actual Email Ids
-          to=['prateek.kumar@hdfcred.com'],
+          to=['prateek.kumar@hdfcred.com','siyaram.gupta@hdfcred.com'],
           headers={"Reply-To": "support@hdfcred.com"}
         )
         
@@ -79,7 +95,7 @@ class MongoConnectionForWebsite:
 mongo = MongoConnectionForWebsite()
 
 def cronJob(request):
-    leads = mongo.getLeads(20)
+    leads = mongo.getLeads(10)
     for lead in leads:
         if User.objects.filter(unique_cookie_id=lead['unique_cookie_id']).exists():
             user = User.objects.get(unique_cookie_id=lead['unique_cookie_id'])
@@ -100,8 +116,14 @@ def cronJob(request):
         else:
             filledLead = FilledLeads(user=user, project_no=lead['project_no'])
             filledLead.save()
-            sendMail(user=user, projectNo=lead['project_no'])
-        
+            sendMail(user=user) #, projectNo=lead['project_no']
+
+
+def sendMailTestApi(request):
+    userId = request.GET.get('user', None)
+    user = User.objects.get(unique_cookie_id=userId)
+    sendMail(user=user)
+     
 def getProjectInfo(projectConfigNo):
 
     db = MySQLdb.connect(host="127.0.0.1", port=3306, user="root", db="REDADMIN2", cursorclass=MySQLdb.cursors.DictCursor)

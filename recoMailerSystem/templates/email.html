@@ -1,22 +1,140 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}Thank you for showing you interest on {{}}.{% endblocktrans %}
+Thank you for showing you interest. Below are
+some of the Recommended Properties for you based on your past search:
 
-{% trans "Below are some of the Recommended Properties for you based on your past search" %}
-
-<table>
+<!-- <table>
 	<tr>
-		{% for recoProperty in recoProperties %}
+		
 		    <td>
 		        <a href="{{recoProperty.url}}"><img src="{{recoProperty.imageUrl}}"></a>
 		        <br>
 		        <a href="http://localhost:9000/recoMail/enquireNow/?user={{userId}}&project={{recoProperty.project_no}}&projectConfig={{recoProperty.project_config_no}}"><button>Enquire Now</button></a>
 		    </td>
-		{% endfor %}
+		
 	</tr>
+</table> -->
+
+<br>
+
+<table>
+
+	{% for project in recoProperties %}
+	<tr style="border-bottom: 1px solid #e9e9e9;display:inline-block">
+		<td>
+			<div class="container-left"
+				style="width: 270px; height: 200px; float: left; position: relative;">
+				<a href="{{project.url}}" target="_blank"
+					data-jclick="project_overview" data-id="clicked"
+					data-value="project_opened"
+					data-project-capture="{{project.project_no}}"
+					data-project-configno-capture="{{project.project_config_no}}"><img
+					src="{{project.imageUrl}}" alt="Property Image"
+					class="property-img" style="width: 100%; height: 100%;"> </a>
+			</div>
+		</td>
+		<td>
+
+			<div class="container-right"
+				style="margin: 0 40px; width: 500px; float: right; font-family: 'Open Sans', sans-serif;">
+
+				<table style="width: 100%">
+					<tr>
+						<td colspan="3">
+							<div class="top-row"
+								style="width: 100%; border-bottom: 1px solid #e9e9e9; display: inline-block; padding: 10px 0;">
+								<div class="left-section"
+									style="display: inline-block; float: left; font-size: 13px; color: #a0a0a0; max-width: calc(100% - 200px);">
+									<div class="property" style="line-height: 1.3;">
+										<a href="{{project.url}}" target="_blank"
+											data-jclick="project_overview" data-id="clicked"
+											data-value="project_opened"
+											data-project-capture="{{project.project_no}}"
+											data-project-configno-capture="{{project.project_config_no}}"><big>{{project.project_name}}</big></a><span
+											class="developer-name"> by {{project.developer_name}}</span>
+									</div>
+									<div class="property-location">{{project.address}},
+										{{project.project_suburb_name}}</div>
+									<div class="property-posession" style="color: #555;">Possession:
+										{{project.possession_text}}</div>
+								</div>
+							</div>
+						</td>
+						
+					</tr>
+					<br>
+					<tr
+						style="padding: 12px 0; border-bottom: 1px solid #e9e9e9; position: relative;">
+						
+						<td>
+							<div class="mr-item"
+								style="border-right: 1px solid #e9e9e9; display: block; float: left; width: 100%;">
+								<span class="title"
+									style="font-size: 10px; display: block; text-transform: uppercase; color: #a0a0a0;">bedrooms</span>
+								<span class="value"
+									style="font-size: 22px; display: block; color: #4c4d4f;">{{project.no_of_bedroom}}
+									BHK</span>
+							</div>
+						</td>
+						<td>
+							<div class="mr-item"
+								style="border-right: 1px solid #e9e9e9; display: block; float: left; width: 100%;">
+								<span class="title"
+									style="font-size: 10px; display: block; text-transform: uppercase; color: #a0a0a0;">sellable</span>
+								<span class="value"
+									style="font-size: 22px; display: block; color: #4c4d4f;">{{project.built_up_area}}
+									<small>SQ.FT</small>
+								</span>
+							</div>
+						</td>
+						<td>
+							<div class="mr-item"
+								style="border-right: 1px solid #e9e9e9; display: block; float: left; width: 100%;">
+								<span class="title"
+									style="font-size: 10px; display: block; text-transform: uppercase; color: #a0a0a0;">cost</span>
+								<span class="value"
+									style="font-size: 22px; display: block; color: #4c4d4f;">₹
+									{{project.price_string}} </span>
+							</div>
+
+						</td>
+					</tr>
+					<!-- <tr>
+				<td colspan="3">
+				<div class="bottom-row" style="padding-top: 12px;">
+					<span class="title"
+						style="font-size: 10px; display: block; text-transform: uppercase; color: #a0a0a0;">Amenities</span>
+					<ul class="amenities"
+						style="list-style: none; padding-left: 0; padding-top: 12px; font-size: 20px; margin-top: 0; margin-bottom: 8.5px;">
+						{% for amenity in project.amenitiesList %}
+						<li title="" data-toggle="tooltip" data-placement="top"
+							class="icon-{{amenity.split|join:'-'|lower}}"
+							data-original-title="{{amenity}}" style="content: "\3b";"></li> {% endfor %}
+					</ul>
+				</div>
+				</td>
+				</tr> -->
+					<tr>
+					<td colspan="3" style="text-align: center;">
+					<br>
+					
+					<a href="http://localhost:9000/recoMail/enquireNow/?user={{userId}}&project={{project.project_no}}&projectConfig={{project.project_config_no}}" style="margin-left:auto;margin-right:auto;text-align: center;">
+						<button
+							style="margin-left:auto;margin-right:auto;text-align:center; background-color: #4CAF50; /* Green */ border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px;">Enquire
+							Now</button></a>
+					</td>
+					</tr>
+				</table>
+			</div>
+
+		</td>
+	</tr>
+	{% endfor %}
+
 </table>
+<br>
 
-{% trans "Thanks for choosing HDFCRED!!" %}
 
-{% blocktrans %}The HDFCRED team{% endblocktrans %}
 
-{% endautoescape %}
+
+{% trans "Thanks for choosing HDFCRED!!" %} {% blocktrans %}The HDFCRED
+team{% endblocktrans %} {% endautoescape %}

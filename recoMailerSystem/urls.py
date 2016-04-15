@@ -18,4 +18,5 @@ from django.conf.urls import include, url
 urlpatterns = [
                url(r'^$', 'recoMailerSystem.views.cronJob'),
                url(r'^enquireNow/$', 'recoMailerSystem.views.enquire'),
+               url(r'^testApi/$', 'recoMailerSystem.views.sendMailTestApi'),
 ]
