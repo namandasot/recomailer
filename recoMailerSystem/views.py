@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from aceSystem.settings import RECO_MAILER_API
+from aceSystem.settings import RECO_MAILER_API, LMS_API, LMS_THANKYOU
 import requests
 import ast
 from django.template import loader
@@ -8,7 +8,7 @@ from models import *
 import MySQLdb
 from recoMailerSystem.utilities.getUrls import getImageUrl, getProjUrl
 from datetime import date
-
+from django.http import HttpResponseRedirect
 # Create your views here.
 
 def sendMail(user):
@@ -44,8 +44,7 @@ def sendMail(user):
           subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
           from_email="HDFC RED <recommendation@hdfcred.com>",
-          #to=[user.email],
-          to=['prateek.kumar@hdfcred.com'],
+          to=[user.email],
           headers={"Reply-To": "support@hdfcred.com"}
         )
         
@@ -96,9 +95,17 @@ mongo = MongoConnectionForWebsite()
 
 def cronJob(request):
     leads = mongo.getLeads(10)
+    usersList = {}
     for lead in leads:
-        if User.objects.filter(unique_cookie_id=lead['unique_cookie_id']).exists():
-            user = User.objects.get(unique_cookie_id=lead['unique_cookie_id'])
+        usersList[lead['unique_cookie_id']]={'name':lead['name'],'phone':lead['phone'],'email':lead['email']}
+        
+
+    for leadUser,lead in usersList.iteritems():
+        print leadUser
+        print lead
+        
+        if User.objects.filter(unique_cookie_id=leadUser).exists():
+            user = User.objects.get(unique_cookie_id=leadUser)
             
             if len(lead['name'])!=0:
                 user.name = lead['name']
@@ -108,16 +115,18 @@ def cronJob(request):
                 user.email=lead['email']
             user.save()
         else:
-            user = User(unique_cookie_id=lead['unique_cookie_id'], name=lead['name'], phone=lead['phone'], email=lead['email'])
+            user = User(unique_cookie_id=leadUser, name=lead['name'], phone=lead['phone'], email=lead['email'])
             user.save()
-            
-            
-        if FilledLeads.objects.filter(user=user, project_no=lead['project_no']).exists():
+
+        sendMail(user=user)
+        
+    #no use, just for testing
+    for lead in leads:
+        if FilledLeads.objects.filter(user_id=lead['unique_cookie_id'], project_no=lead['project_no']).exists():
             pass
         else:
-            filledLead = FilledLeads(user=user, project_no=lead['project_no'])
+            filledLead = FilledLeads(user_id=lead['unique_cookie_id'], project_no=lead['project_no'])
             filledLead.save()
-            sendMail(user=user)
 
 
 def sendMailTestApi(request):
@@ -164,6 +173,13 @@ def enquire(request):
     user = User.objects.get(unique_cookie_id=userId)
     newLead = Lead(project_no=projectId, user=user)
     newLead.save()
-    context = {'project':project}
-    return render(request, 'thankYou.html', context)
+    
+    lms_url=LMS_API % (projectId,user.name,user.email,user.phone)
+    response = requests.get(lms_url)
+    if response.status_code==200:
+        leadResponse = ast.literal_eval(response.content)
+    
+    return HttpResponseRedirect(LMS_THANKYOU+str(leadResponse['Project_Enquiry_No']))
+#     context = {'project':project}
+#     return render(request, 'thankYou.html', context)
 

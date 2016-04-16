@@ -103,7 +103,8 @@ USE_TZ = True
 RECO_IP = 'http://127.0.0.1:8000'
 RECO_MAILER_API = RECO_IP+'/recoengine/mailer/?user='
 
-
+LMS_API = "https://www.hdfcred.com/mobile_v2/rest/projectEnquiry/project_no=%s/name=%s/email_id=%s/mobile_code=91/mobile_no=%s/referral_code=reco_alert_mailer"
+LMS_THANKYOU = "https://www.hdfcred.com/thankyou/LeadID:"
 EMAIL_BACKEND = "sgbackend.SendGridBackend"
 SENDGRID_USER = "srmgupta"
 SENDGRID_PASSWORD = "SRM@75000"
