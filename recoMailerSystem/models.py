@@ -11,7 +11,8 @@ class User(models.Model):
 class Lead(models.Model):
     project_no = models.IntegerField()
     user = models.ForeignKey(User)
-
+    lmsResponseNo = models.IntegerField(null=True, blank=True)
+    
 class FilledLeads(models.Model):
     project_no = models.IntegerField()
     user = models.ForeignKey(User)

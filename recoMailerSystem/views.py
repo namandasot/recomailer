@@ -171,13 +171,15 @@ def enquire(request):
     project['url'] = getProjUrl(projectId)
 
     user = User.objects.get(unique_cookie_id=userId)
-    newLead = Lead(project_no=projectId, user=user)
-    newLead.save()
+    
     
     lms_url=LMS_API % (projectId,user.name,user.email,user.phone)
     response = requests.get(lms_url)
     if response.status_code==200:
         leadResponse = ast.literal_eval(response.content)
+        
+    newLead = Lead(project_no=projectId, user=user, lmsResponseNo=leadResponse['Project_Enquiry_No'])
+    newLead.save()
     
     return HttpResponseRedirect(LMS_THANKYOU+str(leadResponse['Project_Enquiry_No']))
 #     context = {'project':project}
