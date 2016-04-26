@@ -77,7 +77,7 @@ class MongoConnectionForWebsite:
         splitted = str(lastTime).split(':')
         lastTime = splitted[0] + ":" + splitted[1]
 
-        leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" , "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
+        leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" , "successful_lead":"1", "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
         
         # lead2 = self.collection.find({ "data_storage_element" : "lead_popup" , "tsDate" :{"$gte": lastTime ,"$lt" : currentTime}})
         
