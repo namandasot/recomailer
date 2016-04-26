@@ -14,10 +14,9 @@ from django.http import HttpResponseRedirect
 def sendMail(user):
     # userId = request.GET.get('user',None)
     userId = user.unique_cookie_id
-    print userId
 
     req = requests.get(RECO_MAILER_API + userId)    
-    print req.status_code
+
     if req.status_code == 200:
         recoProperties = ast.literal_eval(req.content)
         for recoProperty in recoProperties:
@@ -25,7 +24,7 @@ def sendMail(user):
             recoProperty['url'] = getProjUrl(recoProperty['project_no']).replace('https://www.', '')
             
             amenities = recoProperty['amenities'].split(',')
-            print amenities
+
             recoProperty['amenitiesList']=[x for x in amenities if x]
             if len(recoProperty['amenitiesList'])>12:
                 recoProperty['amenitiesList'] = recoProperty['amenitiesList'][:12]
@@ -39,7 +38,7 @@ def sendMail(user):
             else:
                 recoProperty['price_string'] = recoProperty['minimum_price']
             
-        print user.email    
+
         mail = EmailMultiAlternatives(
           subject="Thank you for showing interest in HDFCRED",
           body="This is a simple text email body.",
@@ -76,7 +75,7 @@ class MongoConnectionForWebsite:
         lastTime = datetime.datetime.now() - datetime.timedelta(minutes=UTCdiff + timeDiff)
         splitted = str(lastTime).split(':')
         lastTime = splitted[0] + ":" + splitted[1]
-
+        print "mongo query time: " + str(lastTime)+" to " + str(currentTime)
         leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" , "successful_lead":"1", "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
         
         # lead2 = self.collection.find({ "data_storage_element" : "lead_popup" , "tsDate" :{"$gte": lastTime ,"$lt" : currentTime}})
@@ -86,7 +85,7 @@ class MongoConnectionForWebsite:
 
         for lead in leadFooterForm:
             lead['phone'] = lead.pop('mobilenumber')
-            print lead
+
             leads.append(lead)
         
         return leads
@@ -94,6 +93,7 @@ class MongoConnectionForWebsite:
 mongo = MongoConnectionForWebsite()
 
 def cronJob(request):
+    print "##########################time" + str(datetime.datetime.now())
     leads = mongo.getLeads(10)
     usersList = {}
     for lead in leads:
@@ -101,8 +101,6 @@ def cronJob(request):
         
 
     for leadUser,lead in usersList.iteritems():
-        print leadUser
-        print lead
         
         if User.objects.filter(unique_cookie_id=leadUser).exists():
             user = User.objects.get(unique_cookie_id=leadUser)
@@ -154,7 +152,7 @@ def enquire(request):
     priceLen = len(str(project['Minimum_Price']))
     
     amenities = project['amenities'].split(',')
-    print amenities
+
     project['amenitiesList']=[x for x in amenities if x]
     if len(project['amenitiesList'])>12:
         project['amenitiesList'] = project['amenitiesList'][:12]
