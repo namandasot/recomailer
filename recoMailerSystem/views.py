@@ -105,11 +105,11 @@ def cronJob(request):
         if User.objects.filter(unique_cookie_id=leadUser).exists():
             user = User.objects.get(unique_cookie_id=leadUser)
             
-            if len(lead['name'])!=0:
+            if len(lead['name'].strip())!=0:
                 user.name = lead['name']
-            if len(lead['phone'])!=0:
+            if len(lead['phone'].strip())!=0:
                 user.phone=lead['phone']
-            if len(lead['email'])!=0:
+            if len(lead['email'].strip())!=0:
                 user.email=lead['email']
             user.save()
         else:
@@ -147,26 +147,26 @@ def getProjectInfo(projectConfigNo):
 def enquire(request):
     userId = request.GET.get('user', None)
     projectId = request.GET.get('project', None)
-    projectConfigNo = request.GET.get('projectConfig', None)
-    project = getProjectInfo(projectConfigNo)
-    priceLen = len(str(project['Minimum_Price']))
-    
-    amenities = project['amenities'].split(',')
-
-    project['amenitiesList']=[x for x in amenities if x]
-    if len(project['amenitiesList'])>12:
-        project['amenitiesList'] = project['amenitiesList'][:12]
-        
-    #ToDo
-    if priceLen<8 and priceLen>5:
-        project['price_string'] = str(project['Minimum_Price']/100000)+" L+"
-    elif priceLen>7:
-        project['price_string'] = str(project['Minimum_Price']/10000000.0)+" Cr+"
-    else:
-        project['price_string'] = project['Minimum_Price']
-    
-    project['imageUrl'] = getImageUrl(projectId, project['Project_Name'])
-    project['url'] = getProjUrl(projectId)
+#     projectConfigNo = request.GET.get('projectConfig', None)
+#     project = getProjectInfo(projectConfigNo)
+#     priceLen = len(str(project['Minimum_Price']))
+#     
+#     amenities = project['amenities'].split(',')
+# 
+#     project['amenitiesList']=[x for x in amenities if x]
+#     if len(project['amenitiesList'])>12:
+#         project['amenitiesList'] = project['amenitiesList'][:12]
+#         
+#     #ToDo
+#     if priceLen<8 and priceLen>5:
+#         project['price_string'] = str(project['Minimum_Price']/100000)+" L+"
+#     elif priceLen>7:
+#         project['price_string'] = str(project['Minimum_Price']/10000000.0)+" Cr+"
+#     else:
+#         project['price_string'] = project['Minimum_Price']
+#     
+#     project['imageUrl'] = getImageUrl(projectId, project['Project_Name'])
+#     project['url'] = getProjUrl(projectId)
 
     user = User.objects.get(unique_cookie_id=userId)
     
