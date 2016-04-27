@@ -99,9 +99,9 @@ def cronJob(request):
     for lead in leads:
         usersList[lead['unique_cookie_id']]={'name':lead['name'],'phone':lead['phone'],'email':lead['email']}
         
-
+    count =0
     for leadUser,lead in usersList.iteritems():
-        
+        count = count+1
         if User.objects.filter(unique_cookie_id=leadUser).exists():
             user = User.objects.get(unique_cookie_id=leadUser)
             
@@ -122,7 +122,8 @@ def cronJob(request):
             user.save()
 
         sendMail(user=user)
-        
+    print "toatal leads filled in past 10 minutes are : " + str(count)
+    
     #no use, just for testing
     for lead in leads:
         if FilledLeads.objects.filter(user_id=lead['unique_cookie_id'], project_no=lead['project_no']).exists():
