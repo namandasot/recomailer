@@ -105,13 +105,18 @@ def cronJob(request):
         if User.objects.filter(unique_cookie_id=leadUser).exists():
             user = User.objects.get(unique_cookie_id=leadUser)
             
+            flag=0
             if len(lead['name'].strip())!=0:
                 user.name = lead['name']
+                flag=1
             if len(lead['phone'].strip())!=0:
                 user.phone=lead['phone']
+                flag=1
             if len(lead['email'].strip())!=0:
                 user.email=lead['email']
-            user.save()
+                flag=1
+            if flag==1:
+                user.save()
         else:
             user = User(unique_cookie_id=leadUser, name=lead['name'], phone=lead['phone'], email=lead['email'])
             user.save()
