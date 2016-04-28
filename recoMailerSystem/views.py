@@ -76,7 +76,7 @@ class MongoConnectionForWebsite:
         splitted = str(lastTime).split(':')
         lastTime = splitted[0] + ":" + splitted[1]
         print "mongo query time: " + str(lastTime)+" to " + str(currentTime)
-        leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" ,'email': '{ $exists: true, $ne:"" }', "successful_lead":"1", "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
+        leadFooterForm = self.collection.find({ "data_storage_element" : "get_in_touch" ,'email': {"$exists": 1, "$ne":"" }, "successful_lead":"1", "tsDate" :{"$gte": lastTime , "$lt" : currentTime}}, {"_id":0, "mobilenumber":"1", "name":"1", "email":"1", "project_no":"1", "unique_cookie_id":"1", "tsDate":"1"})
         
         # lead2 = self.collection.find({ "data_storage_element" : "lead_popup" , "tsDate" :{"$gte": lastTime ,"$lt" : currentTime}})
         
@@ -96,9 +96,11 @@ def cronJob(request):
     print "##########################time" + str(datetime.datetime.now())
     leads = mongo.getLeads(10)
     usersList = {}
+    count=0
     for lead in leads:
+        count=count+1
         usersList[lead['unique_cookie_id']]={'name':lead['name'],'phone':lead['phone'],'email':lead['email']}
-        
+    print "toatal leads filled in past 10 minutes are : " + str(count)    
     count =0
     for leadUser,lead in usersList.iteritems():
         count = count+1
@@ -122,15 +124,18 @@ def cronJob(request):
             user.save()
 
         sendMail(user=user)
-    print "toatal leads filled in past 10 minutes are : " + str(count)
+    print "toatal unique users who filled leads in past 10 minutes are : " + str(count)
     
+    count=0
     #no use, just for testing
     for lead in leads:
+        count=count+1
         if FilledLeads.objects.filter(user_id=lead['unique_cookie_id'], project_no=lead['project_no']).exists():
             pass
         else:
             filledLead = FilledLeads(user_id=lead['unique_cookie_id'], project_no=lead['project_no'])
             filledLead.save()
+    print "toatal leads filled in past 10 minutes are : " + str(count)
 
 
 def sendMailTestApi(request):
